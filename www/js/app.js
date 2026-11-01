@@ -20,7 +20,7 @@ const App = {
     Exporter.init();
     this.bindTabs();
 
-    Categories.renderManager(document.getElementById('categories-manager'));
+    //Categories.renderManager(document.getElementById('categories-manager'));
 
     // Mevcut kayıtlar için alarmları yeniden kur
     DB.get().records
