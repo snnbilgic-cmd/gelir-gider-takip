@@ -31,6 +31,37 @@ jobs:
             npx cap add android
           fi
 
+      - name: Install ImageMagick
+        run: sudo apt-get update && sudo apt-get install -y imagemagick
+
+      - name: Replace app icons from www/assets/icon.png
+        run: |
+          SRC="www/assets/icon.png"
+          if [ ! -f "$SRC" ]; then
+            echo "⚠️  www/assets/icon.png bulunamadı, varsayılan ikon kullanılacak."
+            exit 0
+          fi
+          RES="android/app/src/main/res"
+          # Icon boyutları (px)
+          declare -A sizes=(
+            [mipmap-mdpi]=48
+            [mipmap-hdpi]=72
+            [mipmap-xhdpi]=96
+            [mipmap-xxhdpi]=144
+            [mipmap-xxxhdpi]=192
+          )
+          for dir in "${!sizes[@]}"; do
+            size="${sizes[$dir]}"
+            mkdir -p "$RES/$dir"
+            convert "$SRC" -resize ${size}x${size} "$RES/$dir/ic_launcher.png"
+            convert "$SRC" -resize ${size}x${size} "$RES/$dir/ic_launcher_round.png"
+            convert "$SRC" -resize ${size}x${size} "$RES/$dir/ic_launcher_foreground.png" || true
+          done
+          # Adaptive icon XML'leri varsa sil (yoksa sorun değil)
+          rm -f "$RES/mipmap-anydpi-v26/ic_launcher.xml" || true
+          rm -f "$RES/mipmap-anydpi-v26/ic_launcher_round.xml" || true
+          echo "✅ İkonlar başarıyla değiştirildi"
+
       - name: Sync Capacitor
         run: npx cap sync android
 
