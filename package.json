@@ -1,0 +1,27 @@
+{
+  "name": "gelir-gider-takip",
+  "version": "1.0.0",
+  "description": "Aylık Gelir/Gider Takip Uygulaması (Capacitor + Vanilla JS)",
+  "scripts": {
+    "sync": "cap sync android",
+    "open": "cap open android",
+    "build:apk": "cd android && ./gradlew assembleDebug",
+    "build:release": "cd android && ./gradlew assembleRelease"
+  },
+  "dependencies": {
+    "@capacitor/android": "^6.1.0",
+    "@capacitor/core": "^6.1.0",
+    "@capacitor/camera": "^6.1.0",
+    "@capacitor/filesystem": "^6.1.0",
+    "@capacitor/share": "^6.0.0",
+    "@capacitor/local-notifications": "^6.1.0",
+    "@capacitor-community/sqlite": "^6.0.0",
+    "@capawesome-team/capacitor-file-picker": "^6.0.0",
+    "xlsx": "^0.18.5",
+    "jspdf": "^2.5.1",
+    "jspdf-autotable": "^3.8.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^6.1.0"
+  }
+}

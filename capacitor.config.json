@@ -1,0 +1,15 @@
+{
+  "appId": "com.sizinadi.gelirgider",
+  "appName": "Gelir Gider Takip",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "android": {
+    "allowMixedContent": true
+  },
+  "plugins": {
+    "LocalNotifications": {
+      "smallIcon": "ic_stat_icon_config_sample",
+      "iconColor": "#488AFF"
+    }
+  }
+}

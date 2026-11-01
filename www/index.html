@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <meta name="theme-color" content="#2563eb" />
+  <title>Gelir Gider Takip</title>
+
+  <!-- Stiller (modüler) -->
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/components.css" />
+
+  <!-- Kütüphaneler (offline için vendor/ altına indirin, şimdilik CDN) -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf-autotable@3.8.2/dist/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- Capacitor (native köprüler için) -->
+  <script>
+    // Capacitor, native'de otomatik yüklenir; web'de window.Capacitor undefined olur — fallback var.
+  </script>
+</head>
+<body data-theme="light">
+
+  <!-- ============ GİRİŞ EKRANI ============ -->
+  <section id="auth-screen" class="auth-screen">
+    <div class="auth-card">
+      <h1>💰 Gelir Gider Takip</h1>
+      <div class="profile-photo-wrap">
+        <img id="auth-photo" src="assets/icon.png" alt="Profil" />
+        <input type="file" id="auth-photo-input" accept="image/*" hidden />
+        <button class="btn-small" id="auth-photo-btn" type="button">Fotoğraf Seç</button>
+      </div>
+      <input type="text" id="auth-username" placeholder="Kullanıcı Adı" autocomplete="username" />
+      <input type="password" id="auth-password" placeholder="Parola" autocomplete="current-password" />
+      <div class="auth-buttons">
+        <button id="btn-login" class="btn btn-primary" type="button">Giriş Yap</button>
+        <button id="btn-register" class="btn btn-secondary" type="button">Kayıt Ol</button>
+      </div>
+      <p id="auth-msg" class="auth-msg"></p>
+    </div>
+  </section>
+
+  <!-- ============ ANA EKRAN ============ -->
+  <main id="app-screen" class="hidden">
+
+    <!-- ÜST BAR -->
+    <header class="topbar">
+      <div class="user-info">
+        <img id="topbar-photo" src="assets/icon.png" alt="Profil" />
+        <span id="topbar-username">Kullanıcı</span>
+      </div>
+      <div class="topbar-actions">
+        <button id="btn-theme-toggle" title="Dark/Light">🌓</button>
+        <button id="btn-theme-pastel" title="Pastel Tema">🎨</button>
+        <button id="btn-logout" title="Çıkış">🚪</button>
+      </div>
+    </header>
+
+    <!-- DÖNEM SEÇİCİ -->
+    <section class="period-bar">
+      <button id="btn-prev-month" class="period-arrow" type="button">◀</button>
+      <div class="period-display">
+        <span id="period-label">Kasım 2026</span>
+      </div>
+      <button id="btn-next-month" class="period-arrow" type="button">▶</button>
+    </section>
+
+    <!-- ÖZET KARTLARI -->
+    <section class="summary-cards">
+      <div class="card card-income"><span>Gelir</span><strong id="sum-income">0 ₺</strong></div>
+      <div class="card card-expense"><span>Gider</span><strong id="sum-expense">0 ₺</strong></div>
+      <div class="card card-balance"><span>Bakiye</span><strong id="sum-balance">0 ₺</strong></div>
+    </section>
+
+    <!-- SEKMELER -->
+    <nav class="tabs">
+      <button class="tab active" data-tab="list" type="button">📋 Kayıtlar</button>
+      <button class="tab" data-tab="add" type="button">➕ Ekle</button>
+      <button class="tab" data-tab="search" type="button">🔍 Ara</button>
+      <button class="tab" data-tab="compare" type="button">📊 Karşılaştır</button>
+      <button class="tab" data-tab="settings" type="button">⚙️ Ayarlar</button>
+    </nav>
+
+    <!-- === KAYITLAR SEKMESİ === -->
+    <section id="tab-list" class="tab-content active">
+      <div class="period-note-wrap">
+        <label for="period-note">Bu ayın notu:</label>
+        <textarea id="period-note" placeholder="Bu döneme ait not..."></textarea>
+        <button id="btn-save-period-note" class="btn-small" type="button">Kaydet</button>
+      </div>
+      <div id="records-list" class="records-list"></div>
+    </section>
+
+    <!-- === EKLE SEKMESİ === -->
+    <section id="tab-add" class="tab-content">
+      <form id="form-record" class="form">
+        <label for="f-type">Tür</label>
+        <select id="f-type">
+          <option value="income">Gelir</option>
+          <option value="expense" selected>Gider</option>
+        </select>
+
+        <label for="f-category">Kategori (rutin liste)</label>
+        <select id="f-category"></select>
+
+        <label for="f-amount">Miktar (TL)</label>
+        <input type="number" id="f-amount" step="0.01" min="0" required />
+
+        <label for="f-due">Son Ödeme Tarihi</label>
+        <input type="date" id="f-due" required />
+
+        <label for="f-note">Not (opsiyonel)</label>
+        <textarea id="f-note" placeholder="Bu kayda ait not..."></textarea>
+
+        <div class="form-buttons">
+          <button type="submit" class="btn btn-primary">Kaydet</button>
+          <button type="button" id="btn-reset-form" class="btn btn-secondary">Temizle</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- === ARAMA SEKMESİ === -->
+    <section id="tab-search" class="tab-content">
+      <input type="text" id="search-input" placeholder="Kategori, not, tutar, tarih ara..." />
+      <div id="search-results" class="records-list"></div>
+    </section>
+
+    <!-- === KARŞILAŞTIRMA SEKMESİ === -->
+    <section id="tab-compare" class="tab-content">
+      <div class="compare-selects">
+        <select id="cmp-a"></select>
+        <select id="cmp-b"></select>
+        <button id="btn-compare" class="btn btn-primary" type="button">Karşılaştır</button>
+      </div>
+      <div id="compare-result" class="compare-result"></div>
+    </section>
+
+    <!-- === AYARLAR SEKMESİ === -->
+    <section id="tab-settings" class="tab-content">
+      <h3>Yedekleme</h3>
+      <button id="btn-export-json" class="btn btn-primary" type="button">📤 JSON Dışa Aktar</button>
+      <button id="btn-import-json" class="btn btn-secondary" type="button">📥 JSON İçe Aktar</button>
+      <input type="file" id="import-file" accept=".json" hidden />
+
+      <h3>Dönem Raporları (aktif dönem)</h3>
+      <button id="btn-export-excel" class="btn btn-primary" type="button">📊 Excel (.xlsx)</button>
+      <button id="btn-export-pdf" class="btn btn-primary" type="button">📄 PDF</button>
+
+      <h3>Kategoriler</h3>
+      <div id="categories-manager"></div>
+    </section>
+
+  </main>
+
+  <!-- ============ ALARM MODALI ============ -->
+  <div id="alarm-modal" class="modal hidden">
+    <div class="modal-card">
+      <h3>⏰ Ödeme Hatırlatması</h3>
+      <p id="alarm-text"></p>
+      <div class="modal-buttons">
+        <button id="alarm-paid" class="btn btn-primary" type="button">✅ Ödendi</button>
+        <button id="alarm-snooze" class="btn btn-secondary" type="button">⏳ 1 Saat Sonra</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============ SCRIPT SIRASI (ÖNEMLİ) ============ -->
+  <script src="js/db.js"></script>
+  <script src="js/categories.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/theme.js"></script>
+  <script src="js/alarm.js"></script>
+  <script src="js/transactions.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/compare.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

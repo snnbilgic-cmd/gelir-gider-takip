@@ -1,0 +1,100 @@
+/* === RESET & DEĞİŞKENLER === */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --radius: 12px;
+  --shadow: 0 2px 8px rgba(0,0,0,0.08);
+  --transition: 0.2s ease;
+}
+
+/* Light tema */
+body[data-theme="light"] {
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --text: #1f2937;
+  --text-muted: #6b7280;
+  --primary: #2563eb;
+  --primary-contrast: #ffffff;
+  --secondary: #e5e7eb;
+  --secondary-text: #111827;
+  --border: #e5e7eb;
+  --income: #16a34a;
+  --expense: #dc2626;
+  --balance: #2563eb;
+}
+
+/* Dark tema */
+body[data-theme="dark"] {
+  --bg: #0f172a;
+  --surface: #1e293b;
+  --text: #f1f5f9;
+  --text-muted: #94a3b8;
+  --primary: #3b82f6;
+  --primary-contrast: #ffffff;
+  --secondary: #334155;
+  --secondary-text: #f1f5f9;
+  --border: #334155;
+  --income: #22c55e;
+  --expense: #ef4444;
+  --balance: #60a5fa;
+}
+
+/* 5 PASTEL TEMA */
+body[data-theme="pastel-1"] {
+  --bg: #fdf2f8; --surface: #ffffff; --text: #831843;
+  --text-muted: #9d174d; --primary: #ec4899; --primary-contrast: #fff;
+  --secondary: #fbcfe8; --secondary-text: #831843; --border: #f9a8d4;
+  --income: #10b981; --expense: #f43f5e; --balance: #db2777;
+}
+body[data-theme="pastel-2"] {
+  --bg: #ecfeff; --surface: #ffffff; --text: #164e63;
+  --text-muted: #155e75; --primary: #06b6d4; --primary-contrast: #fff;
+  --secondary: #a5f3fc; --secondary-text: #164e63; --border: #67e8f9;
+  --income: #10b981; --expense: #f43f5e; --balance: #0891b2;
+}
+body[data-theme="pastel-3"] {
+  --bg: #f0fdf4; --surface: #ffffff; --text: #14532d;
+  --text-muted: #166534; --primary: #22c55e; --primary-contrast: #fff;
+  --secondary: #bbf7d0; --secondary-text: #14532d; --border: #86efac;
+  --income: #16a34a; --expense: #dc2626; --balance: #15803d;
+}
+body[data-theme="pastel-4"] {
+  --bg: #fefce8; --surface: #ffffff; --text: #713f12;
+  --text-muted: #854d0e; --primary: #eab308; --primary-contrast: #fff;
+  --secondary: #fef08a; --secondary-text: #713f12; --border: #fde047;
+  --income: #16a34a; --expense: #dc2626; --balance: #ca8a04;
+}
+body[data-theme="pastel-5"] {
+  --bg: #f5f3ff; --surface: #ffffff; --text: #4c1d95;
+  --text-muted: #5b21b6; --primary: #8b5cf6; --primary-contrast: #fff;
+  --secondary: #ddd6fe; --secondary-text: #4c1d95; --border: #c4b5fd;
+  --income: #16a34a; --expense: #dc2626; --balance: #7c3aed;
+}
+
+body {
+  font-family: var(--font);
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  transition: background var(--transition), color var(--transition);
+}
+
+.hidden { display: none !important; }
+
+h1, h2, h3 { font-weight: 600; }
+button { cursor: pointer; font-family: inherit; }
+input, select, textarea {
+  font-family: inherit;
+  font-size: 14px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+  width: 100%;
+}
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid var(--primary);
+  outline-offset: 0;
+}
